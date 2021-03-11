@@ -2,7 +2,6 @@ package com.merkenlabs.googleapiwrapper.docs
 
 import com.google.api.services.docs.v1.model.*
 
-
 abstract class AbstractDocsServiceWrapper : IDocsServiceWrapper {
     override fun replaceTextInFile(fileId: String, oldText: String, newText: String) {
         val request = createReplaceTextRequest(oldText, newText)
@@ -25,6 +24,10 @@ abstract class AbstractDocsServiceWrapper : IDocsServiceWrapper {
         val request = createReplaceImageRequest(imageObjectId, newImageUri)
         val body = getBodyWithRequests(request)
         val result = getDocsService().documents().batchUpdate(fileId, body).execute()
+    }
+
+    override fun getDocumentById(fileId: String): Document {
+        return getDocsService().documents().get(fileId).execute()
     }
 
     private fun getBodyWithRequests(requests: List<Request>): BatchUpdateDocumentRequest {
