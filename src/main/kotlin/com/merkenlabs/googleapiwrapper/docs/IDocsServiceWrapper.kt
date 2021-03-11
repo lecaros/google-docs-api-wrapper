@@ -5,5 +5,6 @@ import com.google.api.services.docs.v1.Docs
 interface IDocsServiceWrapper {
     fun replaceTextInFile(fileId: String, oldText: String, newText: String)
     fun replaceAllTextsInFile(fileId: String, pairsToReplace: Map<String, String>)
+    fun replaceImage(fileId: String, imageObjectId: String, newImageUri: String)
     fun getDocsService(): Docs
 }

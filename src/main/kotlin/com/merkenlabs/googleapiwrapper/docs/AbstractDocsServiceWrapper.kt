@@ -1,16 +1,14 @@
 package com.merkenlabs.googleapiwrapper.docs
 
-import com.google.api.services.docs.v1.model.BatchUpdateDocumentRequest
-import com.google.api.services.docs.v1.model.ReplaceAllTextRequest
-import com.google.api.services.docs.v1.model.Request
-import com.google.api.services.docs.v1.model.SubstringMatchCriteria
+import com.google.api.services.docs.v1.model.*
+
 
 abstract class AbstractDocsServiceWrapper : IDocsServiceWrapper {
     override fun replaceTextInFile(fileId: String, oldText: String, newText: String) {
         val request = createReplaceTextRequest(oldText, newText)
-        val body = BatchUpdateDocumentRequest()
+        val body = getBodyWithRequests(request)
         val results =
-            getDocsService().documents().batchUpdate(fileId, body.setRequests(mutableListOf(request))).execute()
+            getDocsService().documents().batchUpdate(fileId, body).execute()
 
         val occurrenceschanged = results.replies[0].replaceAllText.occurrencesChanged
     }
@@ -18,9 +16,31 @@ abstract class AbstractDocsServiceWrapper : IDocsServiceWrapper {
     override fun replaceAllTextsInFile(fileId: String, pairsToReplace: Map<String, String>) {
         val requests = createReplaceTextRequest(pairsToReplace)
 
-        val bodyPlural = BatchUpdateDocumentRequest()
+        val body = getBodyWithRequests(requests)
         val result =
-            getDocsService().documents().batchUpdate(fileId, bodyPlural.setRequests(requests)).execute()
+            getDocsService().documents().batchUpdate(fileId, body).execute()
+    }
+
+    override fun replaceImage(fileId: String, imageObjectId: String, newImageUri: String) {
+        val request = createReplaceImageRequest(imageObjectId, newImageUri)
+        val body = getBodyWithRequests(request)
+        val result = getDocsService().documents().batchUpdate(fileId, body).execute()
+    }
+
+    private fun getBodyWithRequests(requests: List<Request>): BatchUpdateDocumentRequest {
+        return BatchUpdateDocumentRequest().setRequests(requests)
+    }
+
+    private fun getBodyWithRequests(request: Request): BatchUpdateDocumentRequest {
+        return getBodyWithRequests(listOf(request))
+    }
+
+    private fun createReplaceImageRequest(imageObjectId: String, newImageUri: String): Request {
+        return Request().setReplaceImage(
+            ReplaceImageRequest()
+                .setImageObjectId(imageObjectId)
+                .setUri(newImageUri)
+        )
     }
 
     private fun createReplaceTextRequest(textToReplace: String, newText: String, matchCase: Boolean = true): Request {
