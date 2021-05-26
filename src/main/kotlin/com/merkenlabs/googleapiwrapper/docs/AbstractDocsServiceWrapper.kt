@@ -20,6 +20,20 @@ abstract class AbstractDocsServiceWrapper : IDocsServiceWrapper {
             getDocsService().documents().batchUpdate(fileId, body).execute()
     }
 
+    override fun insertImage(fileId: String, newImageUri: String, location: Location, size: Size?) {
+        val request = createInsertImageRequest(location, newImageUri, size)
+        val body = getBodyWithRequests(request)
+        val result = getDocsService().documents().batchUpdate(fileId,body).execute()
+    }
+
+    private fun createInsertImageRequest(location: Location, imageUri: String, size: Size?): Request {
+        val inlineImageRequest = InsertInlineImageRequest()
+            .setLocation(location)
+            .setUri(imageUri)
+        size?.let { inlineImageRequest.setObjectSize(size) }
+        return Request().setInsertInlineImage(inlineImageRequest)
+    }
+
     override fun replaceImage(fileId: String, imageObjectId: String, newImageUri: String) {
         val request = createReplaceImageRequest(imageObjectId, newImageUri)
         val body = getBodyWithRequests(request)
