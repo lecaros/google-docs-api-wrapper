@@ -17,7 +17,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
-    implementation("com.google.apis:google-api-services-docs:v1-rev20210302-1.31.0")
+    implementation("com.google.apis:google-api-services-docs:v1-rev20210323-1.31.0")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -41,4 +41,17 @@ publishing{
             from(components["java"])
         }
     }
+    repositories {
+        maven {
+            url = uri(System.getenv("NEXUS_URL"))
+            credentials {
+                username = System.getenv("NEXUS_USERNAME")
+                password = System.getenv("NEXUS_PASSWORD")
+            }
+            authentication {
+                create<org.gradle.authentication.http.BasicAuthentication>("basic")
+            }
+        }
+    }
+
 }
